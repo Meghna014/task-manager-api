@@ -27,18 +27,21 @@ public class TaskService {
         return tasks;
     }
 
-    public boolean updateTask(Long id, Task task){
-        Optional<Task> foundTask = taskRespository.findById(id);
-        if(foundTask.isPresent())
-        {
-            foundTask = Optional.ofNullable(task);
-            return true;
-        }
-        return false;
+    public Task updateTask(Long id, Task updatedTask){
+        Task existingTask = taskRespository.findById(id).orElseThrow(
+                () -> new RuntimeException("task not found"));
+
+        existingTask.setTitle(updatedTask.getTitle());
+        existingTask.setDescription(updatedTask.getDescription());
+        existingTask.setCompleted(updatedTask.isCompleted());
+
+        return taskRespository.save(existingTask);
+
+
     }
 
     public void deleteTask(Long id){
-        taskRespository.deleteById(id);
+         taskRespository.deleteById(id);
     }
 
 }
