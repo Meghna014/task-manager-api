@@ -1,42 +1,27 @@
 package com.example.taskmanager.controller;
 
-import com.example.taskmanager.security.JwtUtil;
-import org.apache.logging.log4j.util.Strings;
+import com.example.taskmanager.entity.User;
+import com.example.taskmanager.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
-@RestController
-
+@Controller
 public class AuthController {
 
-    private JwtUtil jwtUtil;
-    private final String USERNAME = "admin";
-    private final String PASSWORD = "admin123";
-    private final String TOKEN = "token";
+    private final UserRepository repo;
+    private final PasswordEncoder encoder;
 
-    public AuthController(JwtUtil jwtUtil)
-    {
-        this.jwtUtil = jwtUtil;
+    public AuthController(UserRepository repo, PasswordEncoder encoder) {
+        this.repo = repo;
+        this.encoder = encoder;
     }
 
-    @PostMapping("/login")
-    public Map<String,String> login(@RequestParam  String username , @RequestParam String password)
-    {
-
-        String token  = Strings.EMPTY;
-            if(USERNAME.equals(username) && PASSWORD.equals(password))
-            {
-                 token = jwtUtil.createToken(username);
-            }
-            else
-            {
-                throw new RuntimeException("Invalid credentials");
-            }
-
-            return Map.of(TOKEN,token);
+    @PostMapping("/saveUser")
+    public String save(User user){
+        user.setPassword(encoder.encode(user.getPassword()));
+        repo.save(user);
+        return "redirect:/login";
     }
 }

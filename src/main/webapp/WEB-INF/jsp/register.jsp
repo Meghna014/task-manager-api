@@ -1,0 +1,13 @@
+<h2>Register</h2>
+
+<form method="post" action="/saveUser">
+    Username:
+    <input name="username"/><br><br>
+
+    Password:
+    <input type="password" name="password"/><br><br>
+
+    <button type="submit">Register</button>
+</form>
+
+<a href="/login">Back to Login</a>

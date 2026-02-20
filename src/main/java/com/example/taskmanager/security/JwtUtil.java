@@ -23,4 +23,14 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256,secretKey)
                 .compact();
     }
+
+    public boolean validateToken(String token)
+    {
+        return false;
+    }
+
+    public String getUsernameFromToken(String token)
+    {
+        return "";
+    }
 }

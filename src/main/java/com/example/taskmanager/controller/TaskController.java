@@ -1,35 +1,53 @@
 package com.example.taskmanager.controller;
 
 import com.example.taskmanager.entity.Task;
+import com.example.taskmanager.entity.User;
+import com.example.taskmanager.repository.TaskRepository;
+import com.example.taskmanager.repository.UserRepository;
 import com.example.taskmanager.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/api/tasks")
 public class TaskController {
+
+    private final TaskRepository taskRepo;
+    private final UserRepository userRepo;
 
     private TaskService taskService;
 
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskRepository taskRepo, UserRepository userRepo, TaskService taskService) {
+        this.taskRepo = taskRepo;
+        this.userRepo = userRepo;
         this.taskService = taskService;
     }
 
 
+    private String currentUser(){
+        return SecurityContextHolder.getContext()
+                .getAuthentication().getName();
+    }
+
     @GetMapping
     public List<Task> getTasks()
     {
-        return  taskService.getAllTasks();
+
+        return taskRepo.findByUserUsername(currentUser());
     }
 
     @PostMapping
     public Task createTask(@RequestBody Task task)
     {
-        return taskService.createTask(task);
+
+        User user=userRepo.findByUsername(currentUser()).get();
+        task.setUser(user);
+        return taskRepo.save(task);
     }
 
     @PutMapping("/{id}")
@@ -42,6 +60,7 @@ public class TaskController {
     @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Long id)
     {
-        taskService.deleteTask(id);
+
+        taskRepo.deleteById(id);
     }
 }
