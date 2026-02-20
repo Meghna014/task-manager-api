@@ -1,42 +1,37 @@
-name: Deploy Cloud Tasks to AWS Elastic Beanstalk
-
 on:
-push:
-branches: [ "main" ]
+  push:
+    branches:
+      - main
 
 jobs:
-deploy:
-runs-on: ubuntu-latest
-  
-  ```
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
+  deploy:
+    runs-on: ubuntu-latest
 
-  - name: Setup Java 17
-    uses: actions/setup-java@v4
-    with:
-      distribution: corretto
-      java-version: 17
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  - name: Build Project
-    run: mvn clean package -DskipTests
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: corretto
+          java-version: 17
 
-  # IMPORTANT: This action already exports credentials for next steps
-  - name: Configure AWS Credentials
-    uses: aws-actions/configure-aws-credentials@v4
-    with:
-      aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      aws-region: us-east-1
+      - name: Build Project
+        run: ./mvnw clean package -DskipTests
 
-  # Deploy WITHOUT specifying keys again
-  - name: Deploy to Elastic Beanstalk
-    uses: einaregilsson/beanstalk-deploy@v22
-    with:
-      application_name: Tasl-Manager
-      environment_name: Tasl-Manager-env
-      version_label: github-${{ github.run_number }}
-      region: us-east-1
-      deployment_package: target/*.jar
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          application_name: Tasl-Manager
+          environment_name: Tasl-Manager-env
+          version_label: github-${{ github.run_number }}
+          region: us-east-1
+          deployment_package: target/*.jar
