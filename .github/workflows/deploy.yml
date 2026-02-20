@@ -1,0 +1,33 @@
+name: Deploy Cloud Tasks to AWS
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+
+      - name: Build JAR
+        run: mvn clean package -DskipTests
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: Tasl-Manager
+          environment_name: Tasl-Manager-env
+          region: us-east-1
+          version_label: github-${{ github.run_number }}
+          deployment_package: target/*.jar
