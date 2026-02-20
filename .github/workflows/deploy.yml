@@ -18,7 +18,7 @@ jobs:
           java-version: 17
 
       - name: Build Project
-        run: ./mvnw clean package -DskipTests
+        run: mvn clean package -DskipTests
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
