@@ -1,13 +1,10 @@
 package com.example.taskmanager.controller;
 
 import com.example.taskmanager.entity.Task;
-import com.example.taskmanager.entity.User;
 import com.example.taskmanager.repository.TaskRepository;
-import com.example.taskmanager.repository.UserRepository;
-import com.example.taskmanager.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,51 +13,42 @@ import java.util.List;
 @RequestMapping("/api/tasks")
 public class TaskController {
 
-    private final TaskRepository taskRepo;
-    private final UserRepository userRepo;
+    private final TaskRepository repo;
+    private final AuthController auth;
+    private static final Logger log = LoggerFactory.getLogger(TaskController.class);
 
-    private TaskService taskService;
-
-
-    public TaskController(TaskRepository taskRepo, UserRepository userRepo, TaskService taskService) {
-        this.taskRepo = taskRepo;
-        this.userRepo = userRepo;
-        this.taskService = taskService;
+    public TaskController(TaskRepository repo, AuthController auth) {
+        this.repo = repo;
+        this.auth = auth;
     }
 
-
-    private String currentUser(){
-        return SecurityContextHolder.getContext()
-                .getAuthentication().getName();
+    private String validate(String token){
+        if(!auth.isValidToken(token))
+            throw new RuntimeException("Unauthorized");
+        return auth.getUsername(token);
     }
 
     @GetMapping
-    public List<Task> getTasks()
-    {
-
-        return taskRepo.findByUserUsername(currentUser());
+    public List<Task> all(@RequestHeader("Authorization") String token){
+        log.info("the authorization recieved is :  "+ token);
+        return repo.findByUsername(validate(token));
     }
 
     @PostMapping
-    public Task createTask(@RequestBody Task task)
-    {
+    public Task create(@RequestHeader("Authorization") String token,
+                       @RequestBody Task task){
 
-        User user=userRepo.findByUsername(currentUser()).get();
-        task.setUser(user);
-        return taskRepo.save(task);
-    }
-
-    @PutMapping("/{id}")
-    public Task updateTask(@PathVariable Long id,
-                           @RequestBody Task task)
-    {
-        return taskService.updateTask(id,task);
+        log.info("the authorization recieved is in create :  "+ token);
+        task.setUsername(validate(token));
+        return repo.save(task);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id)
-    {
+    public ResponseEntity<?> delete(@RequestHeader("Authorization") String token,
+                                    @PathVariable Long id){
 
-        taskRepo.deleteById(id);
+        validate(token);
+        repo.deleteById(id);
+        return ResponseEntity.ok("Deleted");
     }
 }

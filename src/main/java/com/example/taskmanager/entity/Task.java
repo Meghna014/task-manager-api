@@ -1,64 +1,38 @@
 package com.example.taskmanager.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
 public class Task {
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
     private String description;
-    private boolean completed = false;
+    private boolean completed;
+
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @ManyToOne
-    private User user;
+    private String username;   // owner (important)
 
-    public Long getId() {
-        return id;
-    }
+    public Task() {}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() { return id; }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public String getDescription() {
-        return description;
-    }
+    public boolean isCompleted() { return completed; }
+    public void setCompleted(boolean completed) { this.completed = completed; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-
-
-
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 }

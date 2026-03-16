@@ -30,8 +30,8 @@ jobs:
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
         with:
-          application_name: Tasl-Manager
-          environment_name: Tasl-Manager-env
+          application_name: Task-Manager
+          environment_name: Task-Manager-env
           version_label: github-${{ github.run_number }}
           region: us-east-1
           deployment_package: target/*.jar

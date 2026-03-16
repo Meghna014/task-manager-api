@@ -1,0 +1,31 @@
+<h2>Login</h2>
+
+<input id="u" placeholder="username"><br><br>
+<input id="p" type="password" placeholder="password"><br><br>
+
+<button onclick="login()">Login</button>
+<p id="msg"></p>
+
+<a href="register.html">Create new account</a>
+
+<script>
+    async function login(){
+
+     const res = await fetch('/api/login',{
+       method:'POST',
+       headers:{'Content-Type':'application/json'},
+       body:JSON.stringify({
+         username:u.value,
+         password:p.value
+       })
+     });
+
+     if(res.ok){
+       const token = await res.text();
+       localStorage.setItem("token",token);
+       location.href="tasks.html";
+     }else{
+       msg.innerText="Invalid credentials";
+     }
+    }
+</script>
