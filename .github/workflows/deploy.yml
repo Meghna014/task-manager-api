@@ -20,6 +20,9 @@ jobs:
       - name: Build Project
         run: mvn clean package -DskipTests
 
+      - name: List target directory
+        run: ls -la target/
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
