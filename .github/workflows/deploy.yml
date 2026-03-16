@@ -39,4 +39,4 @@ jobs:
           environment_name: Task-Manager-env
           version_label: github-${{ github.run_number }}
           region: us-east-1
-          deployment_package: target/*.jar
+          deployment_package: target/taskmanager-0.0.1-SNAPSHOT.jar
